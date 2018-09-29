@@ -35,20 +35,17 @@ namespace FindCoin.core
         /// <param name="config"></param>
         public void Init(JObject config)
         {
-            Url = "http://127.0.0.1";
-
-            return;
-            Url = config["Url"].ToString();
-            startNetType = config["startNetType"].ToString();
-            try
-            {
-                initConfig(config);
-                LogHelper.printLog("InitTask success:" + name() + "_" + networkType());
-            }
-            catch (Exception ex)
-            {
-                LogHelper.printLog("InitTask failed:" + name() + "_" + networkType() + ",exMsg:" + ex.Message);
-            }
+            //url = config["Url"].ToString();
+            //startNetType = config["startNetType"].ToString();
+            //try
+            //{
+            //    initConfig(config);
+            //    LogHelper.printLog("InitTask success:" + name() + "_" + networkType());
+            //}
+            //catch (Exception ex)
+            //{
+            //    LogHelper.printLog("InitTask failed:" + name() + "_" + networkType() + ",exMsg:" + ex.Message);
+            //}
         }
         public abstract void initConfig(JObject config);
 
@@ -70,14 +67,15 @@ namespace FindCoin.core
         }
         public abstract void startTask();
 
-        private string Url;
-        public string getUrl() {
+        private string url;
+        public string getUrl() {         
+            return "https://api.nel.group/api/testnet/";
             if (networkType() == "testnet")
             {
-                return Url + ":20332/";
+                return url + ":20332/";
             }
             else {
-                return Url + ":10332/";
+                return url + ":10332/";
             }
         }
         /*启动网络类型*/

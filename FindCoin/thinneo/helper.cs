@@ -10,6 +10,7 @@ namespace FindCoin.thinneo
     public static class Helper
     {
         public static int blockHeight = 0;
+        public static int blockTime = 0;
 
         public static int BitLen(int w)
         {

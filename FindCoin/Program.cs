@@ -1,4 +1,5 @@
-﻿using FindCoin.core;
+﻿using FindCoin.Block;
+using FindCoin.core;
 using FindCoin.helper;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace FindCoin
         /// 
         /// </summary>
         private static void InitTask() {
-
+            AddTask(new FindBlock("block"));
         }
 
         /// <summary>
@@ -22,10 +23,10 @@ namespace FindCoin
         /// </summary>
         private static void StartTask()
         {
-            //foreach (var func in list)
-            //{
-            //    func.Init(Config.getConfig());
-            //}
+            foreach (var func in list)
+            {
+                func.Init(Config.getConfig());
+            }
             foreach (var func in list)
             {
                 new Task(() => {
@@ -45,7 +46,12 @@ namespace FindCoin
         {
             ProjectInfo.head();
             InitTask();
-
+            StartTask();
+            ProjectInfo.tail();
+            while (true)
+            {
+                System.Threading.Thread.Sleep(1000);
+            }
         }
     }
 

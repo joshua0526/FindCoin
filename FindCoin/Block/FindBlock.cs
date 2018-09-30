@@ -48,8 +48,10 @@ namespace FindCoin.Block
                 Directory.CreateDirectory("utxo");
             }
             Helper.url = getUrl();
-            while (Helper.blockHeight < 500) {
-                if (Helper.blockHeight > getBlockHeightFromRpc()) {
+            while (Helper.blockHeight < 500)
+            {
+                if (Helper.blockHeight > getBlockHeightFromRpc())
+                {
                     continue;
                 }
 
@@ -59,7 +61,7 @@ namespace FindCoin.Block
 
                 Helper.blockHeight++;
             }
-            SaveUTXO.getInstance().getUTXO("AJ6hqJYnyLLmCT6Cfb7m1R3aXQAEWbeVVo");
+            //Console.WriteLine(SaveUTXO.getInstance().getUTXO("ARFe4mTKRTETerRoMsyzBXoPt2EKBvBXFX").Count);
         }
 
         static WebClient wc = new WebClient();

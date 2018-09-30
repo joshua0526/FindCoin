@@ -54,19 +54,24 @@ namespace FindCoin.Block
         public Dictionary<string, List<Utxo>> getUTXO(string address) {
             Dictionary<string, List<Utxo>> dir = new Dictionary<string, List<Utxo>>();
             var path = Directory.GetCurrentDirectory();
-            string assetid = "";
-            List<Utxo> list = new List<Utxo>();
+            
             foreach (string filePath in Directory.GetFiles(path + "/utxo")) {
-                if (filePath.Contains("address")) {
+                if (filePath.Contains(address)) {
                     JObject jObject = JObject.Parse(File.ReadAllText(filePath));
-                    dir[jObject["asset"].ToString()].Add(new Utxo(jObject["addr"].ToString(), 
-                        new Hash256(Encoding.UTF8.GetBytes(jObject["txid"].ToString())),
+                    if (dir.ContainsKey(jObject["asset"].ToString()) && jObject["used"].ToString() == "0")
+                    {
+                        dir[jObject["asset"].ToString()].Add(new Utxo(jObject["addr"].ToString(),
+                        new Hash256(Helper.HexString2Bytes(jObject["txid"].ToString())),
                         jObject["asset"].ToString(),
-                        decimal.Parse(jObject["value"].ToString()), 
+                        decimal.Parse(jObject["value"].ToString()),
                         int.Parse(jObject["n"].ToString())));
+                    }
+                    else {
+                        dir.Add(jObject["asset"].ToString(),new List<Utxo>());
+                    }                   
                 }
             }
-            return null;
+            return dir;
         }
     }
 

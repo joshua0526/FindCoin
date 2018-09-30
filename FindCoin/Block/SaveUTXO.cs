@@ -34,7 +34,7 @@ namespace FindCoin.Block
                 result["useHeight"] = "";
                 result["claimed"] = "";
 
-                var utxoPath = "utxo" + Path.DirectorySeparatorChar + result["txid"] + "_" + result["n"] + ".txt";
+                var utxoPath = "utxo" + Path.DirectorySeparatorChar + result["txid"] + "_" + result["n"] + "_" + result["addr"] + ".txt";
                 File.Delete(utxoPath);
                 File.WriteAllText(utxoPath, result.ToString(), Encoding.UTF8);
             }
@@ -49,6 +49,41 @@ namespace FindCoin.Block
             result["used"] = 1;
             result["useHeight"] = Helper.blockHeight;
             File.WriteAllText(path, result.ToString(), Encoding.UTF8);
+        }
+
+        public Dictionary<string, List<Utxo>> getUTXO(string address) {
+            Dictionary<string, List<Utxo>> dir = new Dictionary<string, List<Utxo>>();
+            var path = Directory.GetCurrentDirectory();
+            string assetid = "";
+            List<Utxo> list = new List<Utxo>();
+            foreach (string filePath in Directory.GetFiles(path + "/utxo")) {
+                if (filePath.Contains("address")) {
+                    JObject jObject = JObject.Parse(File.ReadAllText(filePath));
+                    dir[jObject["asset"].ToString()].Add(new Utxo(jObject["addr"].ToString(), 
+                        new Hash256(Encoding.UTF8.GetBytes(jObject["txid"].ToString())),
+                        jObject["asset"].ToString(),
+                        decimal.Parse(jObject["value"].ToString()), 
+                        int.Parse(jObject["n"].ToString())));
+                }
+            }
+            return null;
+        }
+    }
+
+    class Utxo {
+        public Hash256 txid;
+        public int n;
+
+        public string addr;
+        public string asset;
+        public decimal value;
+        public Utxo(string _addr, Hash256 _txid, string _asset, decimal _value, int _n)
+        {
+            this.addr = _addr;
+            this.txid = _txid;
+            this.asset = _asset;
+            this.value = _value;
+            this.n = _n;
         }
     }
 }

@@ -44,7 +44,7 @@ namespace FindCoin.Block
             SaveUTXO.getInstance().Save(result, null);
 
             var addressTransactionPath = "addressTransaction" + Path.DirectorySeparatorChar + result["txid"] + ".txt";
-            SaveAddressTransaction.getInstance().Save(result, addressTransactionPath);            
+            SaveAddressTransaction.getInstance().Save(result, addressTransactionPath);
 
             if (result["type"].ToString() == "RegisterTransaction")
             {
@@ -54,6 +54,9 @@ namespace FindCoin.Block
                 }
                 var assetPath = "asset" + Path.DirectorySeparatorChar + result["txid"] + ".txt";
                 saveAsset(jObject, assetPath);
+            }
+            else if (result["type"].ToString() == "InvocationTransaction") {
+                SaveNotify.getInstance().Save(result, null);
             }
         }
 

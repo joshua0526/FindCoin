@@ -47,6 +47,7 @@ namespace FindCoin.Block
             {
                 Directory.CreateDirectory("utxo");
             }
+            Helper.url = getUrl();
             while (Helper.blockHeight < 500) {
                 if (Helper.blockHeight > getBlockHeightFromRpc()) {
                     continue;
@@ -58,29 +59,28 @@ namespace FindCoin.Block
 
                 Helper.blockHeight++;
             }
+            SaveUTXO.getInstance().getUTXO("AJ6hqJYnyLLmCT6Cfb7m1R3aXQAEWbeVVo");
         }
 
         static WebClient wc = new WebClient();
 
-        private int getBlockHeightFromRpc() {
-            var getcounturl = getUrl() + "?jsonrpc=2.0&id=1&method=getblockcount&params=[]";
+        private int getBlockHeightFromRpc() {           
+            var getcounturl = Helper.url + "?jsonrpc=2.0&id=1&method=getblockcount&params=[]";
             var info = wc.DownloadString(getcounturl);
             var json = JObject.Parse(info);
             var result = json["result"];
 
-            return int.Parse(result[0]["blockcount"].ToString());
+            return int.Parse(result.ToString());
         }
 
         private void getBlockFromRpc() {
-            var getcounturl = getUrl() + "?jsonrpc=2.0&id=1&method=getblock&params=[" + Helper.blockHeight + ",1]";
+            var getcounturl = Helper.url + "?jsonrpc=2.0&id=1&method=getblock&params=[" + Helper.blockHeight + ",1]";
             var info = wc.DownloadString(getcounturl);
             var json = JObject.Parse(info);
             var result = json["result"];
 
-            foreach (var r in result) {
-                var path = "block" + Path.DirectorySeparatorChar + Helper.blockHeight.ToString("D08") + "_" + r.Path + ".txt";
-                SaveBlock.getInstance().Save(r as JObject, path);
-            }           
+            var path = "block" + Path.DirectorySeparatorChar + Helper.blockHeight.ToString("D08") + ".txt";
+            SaveBlock.getInstance().Save(result as JObject, path);          
         } 
 
         private void ping()

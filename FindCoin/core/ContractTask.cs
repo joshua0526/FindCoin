@@ -69,7 +69,7 @@ namespace FindCoin.core
 
         private string url;
         public string getUrl() {         
-            return "https://api.nel.group/api/testnet/";
+            return "http://47.107.62.119:20332/";
             if (networkType() == "testnet")
             {
                 return url + ":20332/";

@@ -1,8 +1,10 @@
 ﻿using FindCoin.Block;
 using FindCoin.core;
 using FindCoin.helper;
+using FindCoin.Mysql;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Threading.Tasks;
 
 namespace FindCoin
@@ -14,6 +16,7 @@ namespace FindCoin
         /// 
         /// </summary>
         private static void InitTask() {
+            Config.loadConfig("mysqlConfig.json");
             AddTask(new FindBlock("block"));
         }
 
@@ -44,8 +47,9 @@ namespace FindCoin
 
         static void Main(string[] args)
         {
+            
             ProjectInfo.head();
-            InitTask();
+            InitTask();           
             StartTask();
             ProjectInfo.tail();
             while (true)

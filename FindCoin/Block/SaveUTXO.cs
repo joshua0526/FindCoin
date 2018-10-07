@@ -38,13 +38,14 @@ namespace FindCoin.Block
                 File.Delete(utxoPath);
                 File.WriteAllText(utxoPath, result.ToString(), Encoding.UTF8);
             }
-            foreach (JObject vin in jObject["vin"]) {
-                var inPath = "utxo" + Path.DirectorySeparatorChar + vin["txid"] + "_" + vin["vout"] + ".txt";
-                ChangeUTXO(inPath);
-            }
+            //foreach (JObject vin in jObject["vin"]) {
+            //    var inPath = "utxo" + Path.DirectorySeparatorChar + vin["txid"] + "_" + vin["vout"];
+            //    ChangeUTXO(inPath);
+            //}
         }
 
         public void ChangeUTXO(string path) {
+            Console.WriteLine(path);
             JObject result = JObject.Parse(File.ReadAllText(path, Encoding.UTF8));
             result["used"] = 1;
             result["useHeight"] = Helper.blockHeight;

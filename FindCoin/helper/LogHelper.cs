@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FindCoin.thinneo;
+using System;
 using System.IO;
 using System.Threading;
 
@@ -82,7 +83,7 @@ namespace FindCoin.helper
         public static void ping(int interval, string name)
         {
             Thread.Sleep(interval);
-            Console.WriteLine(DateTime.Now + " " + name + " is running...");
+            Console.WriteLine(DateTime.Now + " " + name + " is running..." + Helper.blockHeight);
         }
     }
 }

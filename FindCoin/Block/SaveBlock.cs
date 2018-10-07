@@ -1,4 +1,5 @@
 ﻿using FindCoin.core;
+using FindCoin.Mysql;
 using FindCoin.thinneo;
 using Newtonsoft.Json.Linq;
 using System;
@@ -31,6 +32,19 @@ namespace FindCoin.Block
             result["nonce"] = jObject["nonce"];
             result["nextconsensus"] = jObject["nextconsensus"];
             result["script"] = jObject["script"];
+
+            List<string> slist = new List<string>();
+            slist.Add(jObject["hash"].ToString());
+            slist.Add(jObject["size"].ToString());
+            slist.Add(jObject["version"].ToString());
+            slist.Add(jObject["previousblockhash"].ToString());
+            slist.Add(jObject["merkleroot"].ToString());
+            slist.Add(jObject["time"].ToString());
+            slist.Add(jObject["index"].ToString());
+            slist.Add(jObject["nonce"].ToString());
+            slist.Add(jObject["nextconsensus"].ToString());
+            slist.Add(jObject["script"].ToString());
+            MysqlConn.ExecuteDataInsert("block", slist);
 
             Helper.blockTime = int.Parse(result["time"].ToString());
 

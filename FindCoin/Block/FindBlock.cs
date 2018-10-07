@@ -48,9 +48,9 @@ namespace FindCoin.Block
                 Directory.CreateDirectory("utxo");
             }
             Helper.url = getUrl();
-            while (Helper.blockHeight < 500)
+            while (Helper.blockHeight < 1)
             {
-                if (Helper.blockHeight > getBlockHeightFromRpc())
+                if (Helper.blockHeight > Helper.blockHeightMax)
                 {
                     continue;
                 }
@@ -66,23 +66,31 @@ namespace FindCoin.Block
 
         static WebClient wc = new WebClient();
 
-        private int getBlockHeightFromRpc() {           
-            var getcounturl = Helper.url + "?jsonrpc=2.0&id=1&method=getblockcount&params=[]";
-            var info = wc.DownloadString(getcounturl);
-            var json = JObject.Parse(info);
-            var result = json["result"];
+        //private int getBlockHeightFromRpc() {           
+        //    var getcounturl = Helper.url + "?jsonrpc=2.0&id=1&method=getblockcount&params=[]";
+        //    var info = wc.DownloadString(getcounturl);
+        //    var json = JObject.Parse(info);
+        //    var result = json["result"];
 
-            return int.Parse(result.ToString());
-        }
+        //    return int.Parse(result.ToString());
+        //}
 
         private void getBlockFromRpc() {
-            var getcounturl = Helper.url + "?jsonrpc=2.0&id=1&method=getblock&params=[" + Helper.blockHeight + ",1]";
-            var info = wc.DownloadString(getcounturl);
-            var json = JObject.Parse(info);
-            var result = json["result"];
+            try
+            {
+                var getcounturl = Helper.url + "?jsonrpc=2.0&id=1&method=getblock&params=[" + Helper.blockHeight + ",1]";
+                var info = wc.DownloadString(getcounturl);
+                var json = JObject.Parse(info);
+                var result = json["result"];
 
-            var path = "block" + Path.DirectorySeparatorChar + Helper.blockHeight.ToString("D08") + ".txt";
-            SaveBlock.getInstance().Save(result as JObject, path);          
+                Helper.blockHeightMax = int.Parse(result["confirmations"].ToString()) + Helper.blockHeight;
+                var path = "block" + Path.DirectorySeparatorChar + Helper.blockHeight.ToString("D08") + ".txt";
+                SaveBlock.getInstance().Save(result as JObject, path);
+            }
+            catch (Exception e)
+            {
+                Helper.blockHeight--;
+            }
         } 
 
         private void ping()

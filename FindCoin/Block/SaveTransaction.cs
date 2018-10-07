@@ -55,9 +55,9 @@ namespace FindCoin.Block
                 var assetPath = "asset" + Path.DirectorySeparatorChar + result["txid"] + ".txt";
                 saveAsset(jObject, assetPath);
             }
-            else if (result["type"].ToString() == "InvocationTransaction") {
-                SaveNotify.getInstance().Save(result, null);
-            }
+            //else if (result["type"].ToString() == "InvocationTransaction") {
+            //    SaveNotify.getInstance().Save(result, null);
+            //}
         }
 
         private void saveAsset(JToken jObject, string path)

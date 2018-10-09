@@ -1,4 +1,5 @@
 ﻿using FindCoin.core;
+using FindCoin.Mysql;
 using FindCoin.thinneo;
 using Newtonsoft.Json.Linq;
 using System;
@@ -31,25 +32,46 @@ namespace FindCoin.Block
                 result["value"] = vout["value"];
                 result["createHeight"] = Helper.blockHeight;
                 result["used"] = 0;
-                result["useHeight"] = "";
+                result["useHeight"] = 0;
                 result["claimed"] = "";
 
-                var utxoPath = "utxo" + Path.DirectorySeparatorChar + result["txid"] + "_" + result["n"] + "_" + result["addr"] + ".txt";
-                File.Delete(utxoPath);
-                File.WriteAllText(utxoPath, result.ToString(), Encoding.UTF8);
+                List<string> slist = new List<string>();
+                slist.Add(result["addr"].ToString());
+                slist.Add(result["txid"].ToString());
+                slist.Add(result["n"].ToString());
+                slist.Add(result["asset"].ToString());
+                slist.Add(result["value"].ToString());
+                slist.Add(result["createHeight"].ToString());
+                slist.Add(result["used"].ToString());
+                slist.Add(result["useHeight"].ToString());
+                slist.Add(result["claimed"].ToString());               
+                MysqlConn.ExecuteDataInsert("utxo", slist);
+
+                //var utxoPath = "utxo" + Path.DirectorySeparatorChar + result["txid"] + "_" + result["n"] + "_" + result["addr"] + ".txt";
+                //File.Delete(utxoPath);
+                //File.WriteAllText(utxoPath, result.ToString(), Encoding.UTF8);
             }
-            //foreach (JObject vin in jObject["vin"]) {
-            //    var inPath = "utxo" + Path.DirectorySeparatorChar + vin["txid"] + "_" + vin["vout"];
-            //    ChangeUTXO(inPath);
-            //}
+            foreach (JObject vin in jObject["vin"])
+            {                
+                ChangeUTXO(vin["txid"].ToString(), vin["vout"].ToString());
+            }
         }
 
-        public void ChangeUTXO(string path) {
-            Console.WriteLine(path);
-            JObject result = JObject.Parse(File.ReadAllText(path, Encoding.UTF8));
-            result["used"] = 1;
-            result["useHeight"] = Helper.blockHeight;
-            File.WriteAllText(path, result.ToString(), Encoding.UTF8);
+        public void ChangeUTXO(string txid, string voutNum) {
+            Dictionary<string, string> dirs = new Dictionary<string, string>();
+            dirs.Add("used", "1");
+            dirs.Add("useHeight", Helper.blockHeight.ToString());
+            Dictionary<string, string> where = new Dictionary<string, string>();
+            where.Add("txid", txid);
+            where.Add("n", voutNum);
+            MysqlConn.Update("utxo", dirs, where);
+
+            //JObject result = JObject.Parse(File.ReadAllText(path, Encoding.UTF8));
+            //result["used"] = 1;
+            //result["useHeight"] = Helper.blockHeight;
+            //File.WriteAllText(path, result.ToString(), Encoding.UTF8);
+
+
         }
 
         public Dictionary<string, List<Utxo>> getUTXO(string address) {
@@ -74,22 +96,5 @@ namespace FindCoin.Block
             }
             return dir;
         }
-    }
-
-    class Utxo {
-        public Hash256 txid;
-        public int n;
-
-        public string addr;
-        public string asset;
-        public decimal value;
-        public Utxo(string _addr, Hash256 _txid, string _asset, decimal _value, int _n)
-        {
-            this.addr = _addr;
-            this.txid = _txid;
-            this.asset = _asset;
-            this.value = _value;
-            this.n = _n;
-        }
-    }
+    }   
 }

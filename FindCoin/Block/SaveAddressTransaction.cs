@@ -1,4 +1,5 @@
 ﻿using FindCoin.core;
+using FindCoin.Mysql;
 using FindCoin.thinneo;
 using Newtonsoft.Json.Linq;
 using System;
@@ -22,18 +23,22 @@ namespace FindCoin.Block
 
         public override void Save(JToken jObject, string path)
         {         
-            if (Directory.Exists("addressTransaction") == false)
-            {
-                Directory.CreateDirectory("addressTransaction");
-            }
+            //JObject result = new JObject();
+            //result["txid"] = jObject["txid"];
+            //result["blockindex"] = Helper.blockHeight;
+            //result["blocktime"] = Helper.blockTime;
 
-            JObject result = new JObject();
-            result["txid"] = jObject["txid"];
-            result["blockindex"] = Helper.blockHeight;
-            result["blocktime"] = Helper.blockTime;
+            foreach (JObject vout in jObject["vout"]) {
+                List<string> slist = new List<string>();
+                slist.Add(vout["address"].ToString());
+                slist.Add(jObject["txid"].ToString());
+                slist.Add(Helper.blockHeight.ToString());
+                slist.Add(Helper.blockTime.ToString());
+                MysqlConn.ExecuteDataInsert("address_tx", slist);
+            }           
 
-            File.Delete(path);
-            File.WriteAllText(path, result.ToString(), Encoding.UTF8);
+            //File.Delete(path);
+            //File.WriteAllText(path, result.ToString(), Encoding.UTF8);
         }
     }
 }

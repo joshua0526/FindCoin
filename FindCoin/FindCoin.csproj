@@ -10,6 +10,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\llvm\llvm.csproj" />
+    <ProjectReference Include="..\signtool\signtool.csproj" />
+    <ProjectReference Include="..\thinSDK\thinSDK.csproj" />
+    <ProjectReference Include="..\thinSDK_neo\thinSDK_neo.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Newtonsoft.Json.dll</HintPath>
     </Reference>

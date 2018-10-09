@@ -10,10 +10,17 @@ namespace FindCoin.Mysql
     {
         public static string conf = "";
 
-        public static DataSet ExecuteDataSet(string sqltext) {
+        public static DataSet ExecuteDataSet(string tableName, Dictionary<string, string> where) {
             using (MySqlConnection conn = new MySqlConnection(conf)) {
                 conn.Open();
-                MySqlDataAdapter adapter = new MySqlDataAdapter(sqltext, conf);
+                string select = "select * from " + tableName + " where";
+                foreach (var dir in where)
+                {
+                    select += " " + dir.Key + "='" + dir.Value + "'";
+                    select += " and";
+                }
+                select = select.Substring(0, select.Length - 4);
+                MySqlDataAdapter adapter = new MySqlDataAdapter(select, conf);
                 DataSet ds = new DataSet();
                 adapter.Fill(ds);
                 return ds;
@@ -25,7 +32,7 @@ namespace FindCoin.Mysql
             using (MySqlConnection conn = new MySqlConnection(conf))
             {
                 conn.Open();
-                string mysql = $"insert into block values (null,";
+                string mysql = $"insert into " + tableName + " values (null,";
                 foreach (string param in parameter) {
                     mysql += "'" + param + "',";
                 }               
@@ -64,13 +71,30 @@ namespace FindCoin.Mysql
         /// <summary>
         /// 修改数据
         /// </summary>
-        private static int Update(MySqlConnection connection, string newName, string oldName)
+        public static int Update(string tableName, Dictionary<string, string> dirs, Dictionary<string, string> where)
         {
-            connection.Open();
-            MySqlCommand command = new MySqlCommand($"update person set name = '{newName}' where name = '{oldName}';", connection);
-            int count = command.ExecuteNonQuery();
-            connection.Close();
-            return count;
+            using (MySqlConnection conn = new MySqlConnection(conf))
+            {
+                conn.Open();
+                string update = $"update " + tableName + " set ";
+                foreach (var dir in dirs)
+                {
+                    update += dir.Key + "='" + dir.Value + "',";
+                }
+                update = update.Substring(0, update.Length - 1);
+                update += " where";
+                foreach (var dir in where)
+                {
+                    update += " " + dir.Key + "='" + dir.Value + "'";
+                    update += " and";
+                }
+                update = update.Substring(0, update.Length - 4);
+                update += ";";
+                MySqlCommand command = new MySqlCommand(update, conn);
+                int count = command.ExecuteNonQuery();
+                conn.Close();
+                return count;
+            }
         }
     }
 }

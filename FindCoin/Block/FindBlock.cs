@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Threading;
 
 namespace FindCoin.Block
 {
@@ -34,24 +35,15 @@ namespace FindCoin.Block
 
         }
 
-        private void run() {
-            if (Directory.Exists("block") == false)
-            {
-                Directory.CreateDirectory("block");
-            }
-            if (Directory.Exists("transaction") == false)
-            {
-                Directory.CreateDirectory("transaction");
-            }
-            if (Directory.Exists("utxo") == false)
-            {
-                Directory.CreateDirectory("utxo");
-            }
+        private void run() {           
             Helper.url = getUrl();
-            while (Helper.blockHeight < 1)
+            Helper.blockHeight = int.Parse(Config.getConfig()["startblock"].ToString());
+            while (Helper.blockHeight < 500000)
             {
                 if (Helper.blockHeight > Helper.blockHeightMax)
                 {
+                    Console.WriteLine("wait for next block...sleep fifteen seconds");
+                    Thread.Sleep(15 * 1000);
                     continue;
                 }
 
@@ -66,31 +58,23 @@ namespace FindCoin.Block
 
         static WebClient wc = new WebClient();
 
-        //private int getBlockHeightFromRpc() {           
-        //    var getcounturl = Helper.url + "?jsonrpc=2.0&id=1&method=getblockcount&params=[]";
-        //    var info = wc.DownloadString(getcounturl);
-        //    var json = JObject.Parse(info);
-        //    var result = json["result"];
-
-        //    return int.Parse(result.ToString());
-        //}
-
         private void getBlockFromRpc() {
+            JToken result = null;
             try
             {
                 var getcounturl = Helper.url + "?jsonrpc=2.0&id=1&method=getblock&params=[" + Helper.blockHeight + ",1]";
                 var info = wc.DownloadString(getcounturl);
                 var json = JObject.Parse(info);
-                var result = json["result"];
-
-                Helper.blockHeightMax = int.Parse(result["confirmations"].ToString()) + Helper.blockHeight;
-                var path = "block" + Path.DirectorySeparatorChar + Helper.blockHeight.ToString("D08") + ".txt";
-                SaveBlock.getInstance().Save(result as JObject, path);
+                result = json["result"];              
             }
             catch (Exception e)
             {
                 Helper.blockHeight--;
             }
+            if (result != null) {
+                Helper.blockHeightMax = int.Parse(result["confirmations"].ToString()) + Helper.blockHeight;                
+                SaveBlock.getInstance().Save(result as JObject, null);
+            }           
         } 
 
         private void ping()

@@ -1,4 +1,5 @@
 ﻿using FindCoin.core;
+using FindCoin.Mysql;
 using FindCoin.thinneo;
 using Newtonsoft.Json.Linq;
 using System;
@@ -36,8 +37,23 @@ namespace FindCoin.Block
             result["nonce"] = jObject["nonce"];
             result["blockindex"] = Helper.blockHeight;
 
-            File.Delete(path);
-            File.WriteAllText(path, result.ToString(), Encoding.UTF8);
+            List<string> slist = new List<string>();
+            slist.Add(result["txid"].ToString());
+            slist.Add(result["size"].ToString());
+            slist.Add(result["type"].ToString());
+            slist.Add(result["version"].ToString());
+            slist.Add(result["attributes"].ToString());
+            slist.Add(result["vin"].ToString());
+            slist.Add(result["vout"].ToString());
+            slist.Add(result["sys_fee"].ToString());
+            slist.Add(result["net_fee"].ToString());
+            slist.Add(result["scripts"].ToString());
+            slist.Add(result["nonce"].ToString());
+            slist.Add(Helper.blockHeight.ToString());
+            MysqlConn.ExecuteDataInsert("tx", slist);
+
+            //File.Delete(path);
+            //File.WriteAllText(path, result.ToString(), Encoding.UTF8);
 
             SaveAddress.getInstance().Save(result["vout"], null);
 
@@ -48,16 +64,13 @@ namespace FindCoin.Block
 
             if (result["type"].ToString() == "RegisterTransaction")
             {
-                if (Directory.Exists("asset") == false)
-                {
-                    Directory.CreateDirectory("asset");
-                }
                 var assetPath = "asset" + Path.DirectorySeparatorChar + result["txid"] + ".txt";
                 saveAsset(jObject, assetPath);
             }
-            //else if (result["type"].ToString() == "InvocationTransaction") {
-            //    SaveNotify.getInstance().Save(result, null);
-            //}
+            else if (result["type"].ToString() == "InvocationTransaction")
+            {
+                SaveNotify.getInstance().Save(result, null);
+            }
         }
 
         private void saveAsset(JToken jObject, string path)
@@ -76,8 +89,23 @@ namespace FindCoin.Block
             result["expiration"] = 0;
             result["frozen"] = 0;
 
-            File.Delete(path);
-            File.WriteAllText(path, result.ToString(), Encoding.UTF8);
+            List<string> slist = new List<string>();
+            slist.Add(result["version"].ToString());
+            slist.Add(result["id"].ToString());
+            slist.Add(result["type"].ToString());
+            slist.Add(result["name"].ToString());
+            slist.Add(result["amount"].ToString());
+            slist.Add(result["available"].ToString());
+            slist.Add(result["precision"].ToString());
+            slist.Add(result["owner"].ToString());
+            slist.Add(result["admin"].ToString());
+            slist.Add(result["issuer"].ToString());
+            slist.Add(result["expiration"].ToString());
+            slist.Add(result["frozen"].ToString());
+            MysqlConn.ExecuteDataInsert("asset", slist);
+
+            //File.Delete(path);
+            //File.WriteAllText(path, result.ToString(), Encoding.UTF8);
         }
     }
 }

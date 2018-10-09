@@ -44,17 +44,14 @@ namespace FindCoin.Block
             slist.Add(jObject["nonce"].ToString());
             slist.Add(jObject["nextconsensus"].ToString());
             slist.Add(jObject["script"].ToString());
+            slist.Add(jObject["tx"].ToString());
             MysqlConn.ExecuteDataInsert("block", slist);
 
             Helper.blockTime = int.Parse(result["time"].ToString());
 
-            File.Delete(path);
-            File.WriteAllText(path, result.ToString(), Encoding.UTF8);
-
             foreach (var tx in jObject["tx"])
-            {
-                var txPath = "transaction" + Path.DirectorySeparatorChar + result["hash"] + ".txt";
-                SaveTransaction.getInstance().Save(tx as JObject, txPath);
+            {               
+                SaveTransaction.getInstance().Save(tx as JObject, null);
             }
         }
     }
